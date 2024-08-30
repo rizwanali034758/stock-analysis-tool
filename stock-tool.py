@@ -16,30 +16,28 @@ class FinancialAnalysisApp:
         self.entries = []
         field_labels = [
             ("Revenue", "Enter total revenue from income statement"),
-            ("Profit", "Enter net profit after tax from income statement"),
-            ("Current Assets", "Enter current assets from balance sheet"),
-            ("Non-current Assets", "Enter non-current assets from balance sheet"),
+            ("Net Profit", "Enter net profit after tax from income statement"),
             ("Total Assets", "Enter total assets from balance sheet"),
-            ("Current Liabilities", "Enter current liabilities from balance sheet"),
-            ("Non-current Liabilities", "Enter non-current liabilities from balance sheet"),
-            ("Total Liabilities", "Enter total liabilities from balance sheet"),
             ("Equity", "Enter shareholders' equity from balance sheet"),
-            ("Operating Expenses", "Enter operating expenses from income statement"),
+            ("Current Assets", "Enter current assets from balance sheet"),
+            ("Current Liabilities", "Enter current liabilities from balance sheet"),
             ("Cash Flow", "Enter cash flow from cash flow statement"),
-            ("Depreciation", "Enter depreciation and amortization from income statement"),
-            ("Interest Expense", "Enter interest expense from income statement"),
+            ("Total Liabilities", "Enter total liabilities from balance sheet"),
+            ("Capital Expenditure", "Enter capital expenditure from cash flow statement"),
+            ("EBITDA", "Enter EBITDA from financial statement"),
+            ("Market Cap", "Enter market capitalization of the company"),
+            ("Dividend", "Enter dividend paid from financial statement"),
+            ("Cost of Goods Sold", "Enter cost of goods sold from income statement"),
             ("Inventory", "Enter inventory from balance sheet"),
             ("Receivables", "Enter receivables from balance sheet"),
             ("Payables", "Enter payables from balance sheet"),
-            ("Capital Expenditure", "Enter capital expenditure from cash flow statement"),
-            ("EBIT", "Enter earnings before interest and taxes from income statement"),
-            ("EBT", "Enter earnings before tax from income statement"),
-            ("Tax", "Enter tax paid from income statement"),
-            ("Market Cap", "Enter market capitalization of the company"),
-            ("Dividend", "Enter dividend paid from financial statement")
+            ("Number of Shares", "Enter number of shares outstanding"),
+            ("Previous Net Profit", "Enter previous net profit for growth calculation"),
+            ("Previous Revenue", "Enter previous revenue for growth calculation"),
+            ("Previous Dividend", "Enter previous dividend for growth calculation"),
+            ("Previous Total Assets", "Enter previous total assets for growth calculation")
         ]
 
-        # Create field labels and text entry widgets
         for i, (label, tooltip) in enumerate(field_labels):
             row = i // 2 + 1
             col = (i % 2) * 2
@@ -48,19 +46,17 @@ class FinancialAnalysisApp:
             
             entry = tk.Entry(self.root, width=30)
             entry.grid(row=row, column=col + 1, padx=10, pady=5)
-            entry.bind("<FocusIn>", lambda e, t=tooltip: self.show_tooltip(t))  # Show tooltip on focus
-            entry.bind("<FocusOut>", lambda e: self.hide_tooltip())  # Hide tooltip when unfocused
-            entry.bind("<Return>", lambda e, idx=i: self.focus_next_entry(idx))  # Handle Enter key for field navigation
+            entry.bind("<FocusIn>", lambda e, t=tooltip: self.show_tooltip(t))
+            entry.bind("<FocusOut>", lambda e: self.hide_tooltip())
+            entry.bind("<Return>", lambda e, idx=i: self.focus_next_entry(idx))
             
             self.entries.append(entry)
 
-        # Submit button
         submit_button = tk.Button(self.root, text="Submit", command=self.calculate_ratios)
         submit_button.grid(row=len(field_labels) // 2 + 1, column=0, columnspan=4, pady=20)
 
-        self.entries[-1].bind("<Return>", lambda e: submit_button.invoke())  # Submit on Enter in last field
+        self.entries[-1].bind("<Return>", lambda e: submit_button.invoke())
 
-        # Tooltip label at the bottom
         self.tooltip_label = tk.Label(self.root, text="", font=('Arial', 10, 'italic'))
         self.tooltip_label.grid(row=len(field_labels) // 2 + 2, column=0, columnspan=4)
 
@@ -76,64 +72,66 @@ class FinancialAnalysisApp:
 
     def calculate_ratios(self):
         try:
-            # Retrieve entered data and perform ratio calculations
-            revenue = float(self.entries[0].get())
-            profit = float(self.entries[1].get())
-            current_assets = float(self.entries[2].get())
-            non_current_assets = float(self.entries[3].get())
-            total_assets = float(self.entries[4].get())
-            current_liabilities = float(self.entries[5].get())
-            non_current_liabilities = float(self.entries[6].get())
-            total_liabilities = float(self.entries[7].get())
-            equity = float(self.entries[8].get())
-            operating_expenses = float(self.entries[9].get())
-            cash_flow = float(self.entries[10].get())
-            depreciation = float(self.entries[11].get())
-            interest_expense = float(self.entries[12].get())
-            inventory = float(self.entries[13].get())
-            receivables = float(self.entries[14].get())
-            payables = float(self.entries[15].get())
-            capex = float(self.entries[16].get())
-            ebit = float(self.entries[17].get())
-            ebt = float(self.entries[18].get())
-            tax = float(self.entries[19].get())
-            market_cap = float(self.entries[20].get())
-            dividend = float(self.entries[21].get())
+            # Retrieve entered data
+            data = [float(entry.get()) for entry in self.entries]
+            (revenue, net_profit, total_assets, equity, current_assets, 
+             current_liabilities, cash_flow, total_liabilities, capex, ebitda, 
+             market_cap, dividend, cogs, inventory, receivables, payables, 
+             num_shares, prev_net_profit, prev_revenue, prev_dividend, prev_total_assets) = data
 
-            # Financial Ratio Calculations
-            ratios = {}
-            ratios['Profit Margin'] = profit / revenue
-            ratios['Return on Assets (ROA)'] = profit / total_assets
-            ratios['Return on Equity (ROE)'] = profit / equity
-            ratios['Gross Margin'] = (revenue - operating_expenses) / revenue
-            ratios['Operating Margin'] = ebit / revenue
-            ratios['Net Profit Margin'] = profit / revenue
-            ratios['Current Ratio'] = current_assets / current_liabilities
-            ratios['Quick Ratio'] = (current_assets - inventory) / current_liabilities
-            ratios['Cash Ratio'] = cash_flow / current_liabilities
-            ratios['Debt to Equity Ratio'] = total_liabilities / equity
-            ratios['Debt to Assets Ratio'] = total_liabilities / total_assets
-            ratios['Interest Coverage Ratio'] = ebit / interest_expense
-            ratios['Equity Ratio'] = equity / total_assets
-            ratios['Asset Turnover'] = revenue / total_assets
-            ratios['Inventory Turnover'] = revenue / inventory
-            ratios['Receivables Turnover'] = revenue / receivables
-            ratios['Payables Turnover'] = revenue / payables
-            ratios['Earnings Per Share (EPS)'] = profit / market_cap
-            ratios['P/E Ratio'] = market_cap / profit
-            ratios['Dividend Yield'] = dividend / market_cap
+            # Calculate ratios
+            ratios = {
+                'Profit Margin': net_profit / revenue,
+                'Return on Assets (ROA)': net_profit / total_assets,
+                'Return on Equity (ROE)': net_profit / equity,
+                'Gross Margin': (revenue - cogs) / revenue,
+                'Operating Margin': ebitda / revenue,
+                'Net Profit Margin': net_profit / revenue,
+                'Current Ratio': current_assets / current_liabilities,
+                'Quick Ratio': (current_assets - inventory) / current_liabilities,
+                'Cash Ratio': cash_flow / current_liabilities,
+                'Debt to Equity Ratio': total_liabilities / equity,
+                'Debt to Assets Ratio': total_liabilities / total_assets,
+                'Interest Coverage Ratio': ebitda / (cogs * 0.05),  # Estimate interest expense
+                'Equity Ratio': equity / total_assets,
+                'Asset Turnover': revenue / total_assets,
+                'Inventory Turnover': revenue / inventory,
+                'Receivables Turnover': revenue / receivables,
+                'Payables Turnover': revenue / payables,
+                'Earnings Per Share (EPS)': net_profit / num_shares,
+                'P/E Ratio': market_cap / net_profit,
+                'Dividend Yield': dividend / market_cap,
+                'EV to EBITDA Ratio': market_cap / ebitda,
+                'Earnings Yield': net_profit / market_cap,
+                'PEG Ratio': (market_cap / net_profit) / ((net_profit - prev_net_profit) / prev_net_profit),
+                'EV to Sales Ratio': market_cap / revenue,
+                'Earnings Growth': (net_profit - prev_net_profit) / prev_net_profit,
+                'Revenue Growth': (revenue - prev_revenue) / prev_revenue,
+                'Dividend Growth Rate': (dividend - prev_dividend) / prev_dividend,
+                'Asset Growth': (total_assets - prev_total_assets) / prev_total_assets,
+                'Operating Cash Flow to Net Income': cash_flow / net_profit,
+                'Free Cash Flow': cash_flow - capex,
+                'Operating Cash Flow to Sales': cash_flow / revenue,
+                'Cash Flow Coverage Ratio': cash_flow / total_liabilities,
+                'Cash Flow Margin': cash_flow / revenue,
+                'Retention Ratio': (net_profit - dividend) / net_profit,
+                'Capital Gearing Ratio': total_liabilities / equity,
+                'Financial Leverage Ratio': total_assets / equity,
+                'Debt to Capital Ratio': total_liabilities / (total_liabilities + equity),
+                'Book Value per Share': equity / num_shares,
+                'Market to Book Ratio': market_cap / equity,
+                'Free Cash Flow Yield': (cash_flow - capex) / market_cap,
+                'Net Profit Ratio': net_profit / revenue,
+                'Company Worth': market_cap / (net_profit / num_shares),
+                'Liquidation Value': total_assets - total_liabilities,
+                'Recovery Percentage': (total_assets - total_liabilities) / total_liabilities
+            }
 
-            # New Features: Company Worth and Recovery Calculation
-            company_worth = ratios['P/E Ratio'] * profit
-            liquidation_value = current_assets - current_liabilities
-
-            # Buy stock decision based on whether it's below worth
+            company_worth = ratios['Company Worth']
+            liquidation_value = ratios['Liquidation Value']
             stock_decision = "BUY" if market_cap < company_worth and ratios['Profit Margin'] > 0.1 else "DO NOT BUY"
-
-            # Recovery decision based on liquidation value
             recovery_decision = "SAFE" if liquidation_value > total_liabilities else "RISKY"
 
-            # Display the results in a new window
             self.show_results(ratios, stock_decision, recovery_decision, company_worth, liquidation_value)
 
         except ValueError:
@@ -143,7 +141,6 @@ class FinancialAnalysisApp:
         result_window = tk.Toplevel(self.root)
         result_window.title("Financial Analysis Results")
 
-        # Scrollable results window with two columns
         canvas = tk.Canvas(result_window)
         scrollbar = ttk.Scrollbar(result_window, orient="vertical", command=canvas.yview)
         scrollable_frame = ttk.Frame(canvas)
@@ -159,36 +156,70 @@ class FinancialAnalysisApp:
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
 
-        result_label = tk.Label(scrollable_frame, text="Financial Ratios", font=('Arial', 14, 'bold'), pady=10)
+        result_label = tk.Label(scrollable_frame, text="Financial Ratios", font=('Arial', 16, 'bold'), pady=10)
         result_label.grid(row=0, column=0, columnspan=2)
 
-        # Display ratios in two columns
         row_count = 1
         for i, (ratio, value) in enumerate(ratios.items()):
             color = "green" if self.is_good(ratio, value) else "red"
-            result_label = tk.Label(scrollable_frame, text=f"{ratio}: {value:.2f}", fg=color)
-            col = i % 2  # Alternate between two columns
+            result_label = tk.Label(scrollable_frame, text=f"{ratio}: {value:.2f}", font=('Arial', 14, 'bold'),fg=color)
+            col = i % 2
             result_label.grid(row=row_count + i // 2, column=col, padx=10, pady=5)
 
-        # Final decision in center
         final_decision_label = tk.Label(scrollable_frame, text=f"Final Decision: {stock_decision}", font=('Arial', 16, 'bold'), fg="blue", pady=20)
         final_decision_label.grid(row=row_count + len(ratios) // 2 + 2, column=0, columnspan=2)
 
         recovery_label = tk.Label(scrollable_frame, text=f"Recovery Decision: {recovery_decision}", font=('Arial', 16, 'bold'), fg="blue", pady=10)
         recovery_label.grid(row=row_count + len(ratios) // 2 + 3, column=0, columnspan=2)
 
-        # Save results button
         save_button = tk.Button(scrollable_frame, text="Save Results to Excel", command=lambda: self.save_to_excel(ratios, stock_decision, recovery_decision, company_worth, liquidation_value))
         save_button.grid(row=row_count + len(ratios) // 2 + 4, column=0, columnspan=2, pady=10)
 
     def is_good(self, ratio, value):
-        # Example thresholds for "good" and "bad" interpretation
         thresholds = {
             'Profit Margin': 0.1,
             'Return on Assets (ROA)': 0.05,
             'Return on Equity (ROE)': 0.15,
             'Current Ratio': 1.5,
-            'Debt to Equity Ratio': 2
+            'Debt to Equity Ratio': 2,
+            'Gross Margin': 0.2,
+            'Operating Margin': 0.1,
+            'Net Profit Margin': 0.1,
+            'Quick Ratio': 1,
+            'Cash Ratio': 0.2,
+            'Debt to Assets Ratio': 0.5,
+            'Interest Coverage Ratio': 3,
+            'Equity Ratio': 0.3,
+            'Asset Turnover': 1,
+            'Inventory Turnover': 5,
+            'Receivables Turnover': 8,
+            'Payables Turnover': 10,
+            'Earnings Per Share (EPS)': 1,
+            'P/E Ratio': 20,
+            'Dividend Yield': 0.03,
+            'EV to EBITDA Ratio': 10,
+            'Earnings Yield': 0.05,
+            'PEG Ratio': 1,
+            'EV to Sales Ratio': 2,
+            'Earnings Growth': 0.1,
+            'Revenue Growth': 0.1,
+            'Dividend Growth Rate': 0.05,
+            'Asset Growth': 0.1,
+            'Operating Cash Flow to Net Income': 1,
+            'Free Cash Flow': 0,
+            'Operating Cash Flow to Sales': 0.1,
+            'Cash Flow Coverage Ratio': 1,
+            'Cash Flow Margin': 0.1,
+            'Retention Ratio': 0.5,
+            'Capital Gearing Ratio': 0.5,
+            'Financial Leverage Ratio': 2,
+            'Debt to Capital Ratio': 0.5,
+            'Book Value per Share': 10,
+            'Market to Book Ratio': 1.5,
+            'Free Cash Flow Yield': 0.05,
+            'Net Profit Ratio': 0.1,
+            'Company Worth': 1,
+            'Liquidation Value': 0
         }
         return value >= thresholds.get(ratio, 0)
 
