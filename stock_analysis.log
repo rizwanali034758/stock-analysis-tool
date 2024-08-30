@@ -1,0 +1,6 @@
+2024-08-30 16:43:26,292 - ERROR - ValueError: The difference between Total Assets and Total Liabilities cannot be zero.
+2024-08-30 16:44:56,377 - ERROR - ValueError: The difference between Total Assets and Total Liabilities cannot be zero.
+2024-08-30 23:32:34,170 - ERROR - ValueError: The difference between Total Assets and Total Liabilities cannot be zero.
+2024-08-30 23:35:44,219 - ERROR - ValueError: The difference between Total Assets and Total Liabilities cannot be zero.
+2024-08-30 23:36:26,913 - ERROR - Unexpected error: type object 'RootLogger' has no attribute 'tk'
+2024-08-30 23:38:02,591 - ERROR - Unexpected error: type object 'RootLogger' has no attribute 'tk'
